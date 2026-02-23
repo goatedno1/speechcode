@@ -1,28 +1,186 @@
 <html>
+<head>
+<title> code for academic fair </title>
+<style>
+marquee{
+height:60px;
+font-size:60px;
+background-color:blue;
+color:red;
+}
+</style>
+</head>
 <body>
-<p>Cultivation of food in space<br>
-Tissue culture<br>
-Tissue culture is the process of growing fragments of plants individually in labs using nutrients. This process could be used in our spaceship for the growth of more yields in a less time.
-Why tissue culture?
-Tissue culture increases the yield in a short time it is also already implemented in earth
-Advantages of tissue culture<br>
-1.  Exact copy of the plant can be created using a fragment of that plant<br>
-2. It can be easily genetically modified <br>
-3.  It can be easily used to make copy of same plant by using a small part of it.<br>
-4. Less chance of causing diseases.<br>
-Aeroponics<br>
-Aeroponics is the process of sending nutrients to the plants through air .This could also be used in our spaceship for the growth of food. This process solves the problem of not having soil in our spaceship 
-Advantages:<br>
-1. It requires less amount of water for the growth of plants<br>
-2. It also needs less use of pesticides<br>
-3. It occupies less space<br>
-4. it is also environment friendly<br>
-It also comes with some disadvantages which are:<br>
-Disadvantages<br>
-1. High maintenance cost<br>
-2. High cost for initial setup<br>
-3. High level of technology knowledge is needed.
+<marquee> code for academic fair</marquee>
+<pre>import pyttsx3 
+import speech_recognition as sr 
+import datetime
+import pyautogui as pg
+import os
+import webbrowser
+import time
+import pywhatkit
+from langchain_ollama import OllamaLLM
+model = OllamaLLM(model="phi3:mini")
+x=0
 
-</p>
+def speak(audio):
+    engine = pyttsx3.init('sapi5')
+    voices = engine.getProperty('voices')
+    engine.setProperty('voice', voices[x].id)
+    engine.say(audio)
+    engine.runAndWait()
+
+
+def wishMe():
+    hour = int(datetime.datetime.now().hour)
+    if hour>=0 and hour<12:
+        speak("Good Morning!")
+
+    elif hour>=12 and hour<18:
+        speak("Good Afternoon!")   
+
+    else:
+        speak("Good Evening!")  
+    speak("I am Jarvis Sir. Please tell me how may I help you")
+    global x
+    x=1
+    speak("I am Jarvis Sir. Please tell me how may I help you")
+    speak("which voice do you like the first one or the second one")
+            
+
+
+def takeCommand():
+    r = sr.Recognizer()
+    while True:
+        
+        with sr.Microphone() as source:
+            print("Listening...")
+            r.adjust_for_ambient_noise(source, duration=0.2)
+            r.pause_threshold = 1.5
+        
+            audio = r.listen(source,phrase_time_limit=5)
+
+        try:
+            print("Recognizing...")    
+            query = r.recognize_google(audio, language='en-in')
+            print(f"User said: {query}\n")
+            return query
+
+        except Exception as e:
+            print(e)
+            speak("Say that again please...")
+            continue
+        
+             
+        
+        
+
+
+
+if __name__ == "__main__":
+    wishMe()
+    while True:
+        
+        query = takeCommand()
+        if query == "None":
+            continue
+        else:
+            query=query.lower()
+        if "first" in query:
+            x=0
+            speak("voice has been set to this voice")
+        elif 'second' in query:
+            x=1
+            speak("voice has been set to this voice")
+            
+        elif 'open youtube' in query:
+            speak("what should i search")
+            query = takeCommand().lower()
+            webbrowser.open(f"https://www.youtube.com/results?search_query={query}")
+        elif 'play song' in query:
+            speak("which song")
+            query = takeCommand().lower()
+            pywhatkit.playonyt(query)
+            
+                
+
+                
+                    
+        elif 'open google' in query.lower():
+             speak("what should i search")
+             query = takeCommand().lower()
+             pywhatkit.search(f"{query}")
+
+
+        elif "open notepad" in query:
+            pg.hotkey('ctrl','alt','n')
+        elif "open python" in query:
+            pg.hotkey('ctrl', 'alt', 'p')
+        elif 'the time' in query:
+            strTime = datetime.datetime.now().strftime("%H:%M:%S")    
+            speak(f"Sir, the time is {strTime}")
+        elif "on writing mode" in query:
+            speak("writing mode activated say stop to exit")
+    
+            while True:
+                text = takeCommand().lower()
+                if "new line" in text:
+                    pg.write("\n")
+                    continue
+                elif "full stop" in text:
+                    pg.write(".")
+                    continue
+        
+                elif text == "none":
+                    continue
+            
+                elif "stop" in text:
+                    speak("Exiting writing mode.")
+                    break
+        
+                pg.write(text+" ")
+        elif "skip ad" in query:
+            a = pg.locateCenterOnScreen("skipad.png", confidence=0.520)
+            if a != None:
+                pg.click(a)
+        elif "question mode" in query:
+            speak("question and answer mode has been activated say stop to exit")
+            while True:
+                
+                question=takeCommand().lower()
+                if "stop" in question:
+                    speak("question and answer mode has been exited")
+                    break
+                
+                print("please wait while we analyse and answer")
+                speak("please wait while we analyse and answer")
+                answer= str(model.invoke(question+"Give the answer in plain text, not LaTeX."+" So, using only plaintext for representation as per your request dont say this kind of things keep it as i never asked ."))
+                print(answer)
+                speak(answer)
+        elif "screenshot" in query:
+            speak("what should i name the screenshot")
+            while True:
+                text=takeCommand().lower()
+                name=text
+                speak("do you confirm this name or what to say again")
+                confirm=takeCommand().lower()
+                if "confirm" in confirm or "yes" in confirm:
+                    break
+            name=name.replace(" ","_")
+            pg.screenshot(str(name)+".png")
+            speak("screenshot has been took sucessfully")
+        elif "who are you" in query or "hu r u" in query:
+            speak("hello sir or mam this is jarvis an basic ai assistant embedded with speech . i am created for a science project. i have many functions i can take screenshots , convert speech to text , play songs or search in youtube, search on google , say the time and many more from just simple speech commands")
+        elif "today" in query:
+            speak("today in india is national science day. on this day many schools make students to do academic fairs The day marks the discovery of the Raman Effect by Indian physicist C.V. Raman in 1928. Since 1986, this day has been dedicated to celebrating scientific achievements and raising awareness about the importance of science in our daily lives.")
+        elif "stop" in query:
+            pg.press("space")
+        elif "resume" in query:
+            pg.press("space")
+        elif 'exit' in query or "quit" in query:
+            speak("exiting the code")
+            break
+        </pre>
 </body>
 </html>
