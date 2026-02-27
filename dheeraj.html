@@ -20,8 +20,7 @@ import os
 import webbrowser
 import time
 import pywhatkit
-from langchain_ollama import OllamaLLM
-model = OllamaLLM(model="phi3:mini")
+
 x=0
 
 def speak(audio):
@@ -144,20 +143,6 @@ if __name__ == "__main__":
             a = pg.locateCenterOnScreen("skipad.png", confidence=0.520)
             if a != None:
                 pg.click(a)
-        elif "question mode" in query:
-            speak("question and answer mode has been activated say stop to exit")
-            while True:
-                
-                question=takeCommand().lower()
-                if "stop" in question:
-                    speak("question and answer mode has been exited")
-                    break
-                
-                print("please wait while we analyse and answer")
-                speak("please wait while we analyse and answer")
-                answer= str(model.invoke(question+"Give the answer in plain text, not LaTeX."+" So, using only plaintext for representation as per your request dont say this kind of things keep it as i never asked ."))
-                print(answer)
-                speak(answer)
         elif "screenshot" in query:
             speak("what should i name the screenshot")
             while True:
@@ -184,3 +169,4 @@ if __name__ == "__main__":
         </pre>
 </body>
 </html>
+
